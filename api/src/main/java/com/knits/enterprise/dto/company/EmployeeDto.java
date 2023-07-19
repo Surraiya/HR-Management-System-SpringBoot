@@ -3,8 +3,6 @@ package com.knits.enterprise.dto.company;
 import com.knits.enterprise.dto.common.OrganizationDto;
 
 import com.knits.enterprise.model.enums.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

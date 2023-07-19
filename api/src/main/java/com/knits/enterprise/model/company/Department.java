@@ -19,4 +19,5 @@ public class Department extends AbstractOrganizationStructure implements Seriali
 
     @OneToMany(mappedBy = "department")
     private List<Employee> employees;
+
 }

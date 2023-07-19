@@ -19,4 +19,5 @@ public class Division extends AbstractOrganizationStructure implements Serializa
 
     @OneToMany(mappedBy = "division")
     private List<Employee> employees;
+
 }

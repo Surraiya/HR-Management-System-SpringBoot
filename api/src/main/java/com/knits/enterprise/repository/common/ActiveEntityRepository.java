@@ -72,5 +72,4 @@ public interface ActiveEntityRepository <T extends AbstractActiveEntity> extends
     }
     @Query("select t from #{#entityName} t where t.active = true")
     List<T> findAllActive();
-
 }
