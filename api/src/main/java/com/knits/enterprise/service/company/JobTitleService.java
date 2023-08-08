@@ -4,7 +4,7 @@ package com.knits.enterprise.service.company;
 import com.knits.enterprise.dto.common.PaginatedResponseDto;
 import com.knits.enterprise.dto.company.JobTitleDto;
 import com.knits.enterprise.dto.search.GenericSearchDto;
-import com.knits.enterprise.exceptions.UserException;
+import com.knits.enterprise.exceptions.JobTitleException;
 import com.knits.enterprise.mapper.company.JobTitleMapper;
 import com.knits.enterprise.model.company.JobTitle;
 import com.knits.enterprise.model.security.User;
@@ -27,40 +27,36 @@ public class JobTitleService {
     private final JobTitleMapper jobTitleMapper;
     private final JobTitleRepository jobTitleRepository;
 
-    @Transactional
     public JobTitleDto saveNewJobTitle(JobTitleDto jobTitleDto) {
         JobTitle jobTitle = jobTitleMapper.toEntity(jobTitleDto);
         jobTitle.setStartDate(LocalDateTime.now());
         jobTitle.setActive(true);
         User currentUser = new User();
         currentUser.setId(1L);
-        jobTitle.setCreatedBy(currentUser); //todo what to do here
+        jobTitle.setCreatedBy(currentUser);
         JobTitle savedJobTitle =jobTitleRepository.save(jobTitle);
-        return jobTitleMapper.toDto(savedJobTitle );
+        return jobTitleMapper.toDto(savedJobTitle);
     }
 
-    @Transactional
     public JobTitleDto findJobTitleById(Long id) {
-        JobTitle jobTitle = jobTitleRepository.findById(id).orElseThrow(() -> new UserException("Job Title #" + id + " not found"));
+        JobTitle jobTitle = jobTitleRepository.findById(id)
+                .orElseThrow(() -> new JobTitleException(String.format("Job Title with ID %d not found",id)));
         return jobTitleMapper.toDto(jobTitle);
     }
 
-    @Transactional
-    public JobTitleDto partialUpdate(JobTitleDto jobTitleDto) {
-        JobTitle jobTitle = jobTitleRepository.findById(jobTitleDto.getId()).orElseThrow(() -> new UserException("Job Title#" + jobTitleDto.getId() + " not found"));
+    public JobTitleDto partialUpdate(Long id, JobTitleDto jobTitleDto) {
+        JobTitle jobTitle = jobTitleRepository.findById(id)
+                .orElseThrow(() -> new JobTitleException(String.format("Job Title with Id %d not found", id)));
         jobTitleMapper.partialUpdate(jobTitle, jobTitleDto);
         jobTitleRepository.save(jobTitle);
         return jobTitleMapper.toDto(jobTitle);
     }
 
-    @Transactional
-    public JobTitleDto deleteJobTitle(Long id) {
-        JobTitle jobTitle = jobTitleRepository.findById(id).get();
+    public void deleteJobTitle(Long id) {
+        JobTitle jobTitle = jobTitleRepository.findById(id)
+                .orElseThrow(() -> new JobTitleException(String.format("Job Title with Id %d does not exist", id)));
         jobTitleRepository.delete(jobTitle);
-        return jobTitleMapper.toDto(jobTitle);
-
     }
-
 
     public PaginatedResponseDto<JobTitleDto> listAll(GenericSearchDto<JobTitle> searchDto) {
 

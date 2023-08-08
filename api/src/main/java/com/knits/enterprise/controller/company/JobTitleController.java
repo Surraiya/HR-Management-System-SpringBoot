@@ -17,7 +17,7 @@ public class JobTitleController {
     @Autowired
     private JobTitleService jobTitleService;
 
-    @PostMapping(value = "/jobTitles", produces = {"application/json"}, consumes = {"application/json"})
+    @PostMapping(value = "/saveJobTitle", produces = {"application/json"}, consumes = {"application/json"})
     public ResponseEntity<JobTitleDto> createNewJobTitle(@RequestBody JobTitleDto jobTitleDto) {
         log.debug("REST request to create jobTitle");
         return ResponseEntity
@@ -25,31 +25,31 @@ public class JobTitleController {
                 .body(jobTitleService.saveNewJobTitle(jobTitleDto));
     }
 
-    @GetMapping(value = "/jobTitles/{id}", produces = {"application/json"})
+    @GetMapping(value = "/viewJobTitle/{id}", produces = {"application/json"})
     public ResponseEntity<JobTitleDto> getjobTitleById(@PathVariable(value = "id") final Long id) {
-        log.debug("REST request to get jobTitle : {}", id);
+        log.debug("REST request to view jobTitle of ID: {}", id);
         JobTitleDto jobTitleFound = jobTitleService.findJobTitleById(id);
         return ResponseEntity
                 .ok()
                 .body(jobTitleFound);
-
     }
 
-    @PatchMapping(value = "/jobTitles", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<JobTitleDto> updatejobTitle(@PathVariable(value = "id") @RequestBody JobTitleDto jobTitleDto) {
-        JobTitleDto jobTitleFound = jobTitleService.partialUpdate(jobTitleDto);
+    @PatchMapping(value = "/updateJobTitle/{id}", produces = {"application/json"}, consumes = {"application/json"})
+    public ResponseEntity<JobTitleDto> updateJobTitle(@PathVariable(value = "id") final Long id, @RequestBody JobTitleDto jobTitleDto) {
+        log.debug("REST request to update jobTitle of ID: {}", id);
+        JobTitleDto updatedJobTitle = jobTitleService.partialUpdate(id, jobTitleDto);
         return ResponseEntity
                 .ok()
-                .body(jobTitleFound);
+                .body(updatedJobTitle);
     }
 
-    @PutMapping(value = "/jobTitles", produces = {"application/json"})
-    public ResponseEntity<JobTitleDto> deletejobTitle(@PathVariable(value = "id") final Long id) {
-        log.debug("REST request to delete jobTitle : {}", id);
-        JobTitleDto jobTitleFound = jobTitleService.deleteJobTitle(id);
+    @DeleteMapping("/deleteJobTitle/{id}")
+    public ResponseEntity<Void> deleteJobTitle(@PathVariable(value = "id") final Long id) {
+        log.debug("REST request to delete JobTitle of ID: {}", id);
+        jobTitleService.deleteJobTitle(id);
         return ResponseEntity
-                .ok()
-                .body(jobTitleFound);
+                .noContent()
+                .build();
     }
 
 }
