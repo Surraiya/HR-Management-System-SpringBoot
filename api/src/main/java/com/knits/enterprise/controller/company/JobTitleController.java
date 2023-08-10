@@ -1,6 +1,8 @@
 package com.knits.enterprise.controller.company;
 
+import com.knits.enterprise.dto.common.PaginatedResponseDto;
 import com.knits.enterprise.dto.company.JobTitleDto;
+import com.knits.enterprise.dto.search.JobTitleSearchDto;
 import com.knits.enterprise.service.company.JobTitleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,4 +54,12 @@ public class JobTitleController {
                 .build();
     }
 
+    @GetMapping(value = "/searchJobTitles", produces = {"application/json"}, consumes = {"application/json"})
+    public ResponseEntity<PaginatedResponseDto<JobTitleDto>> searchJobTitles(@RequestBody JobTitleSearchDto searchDto){
+        log.debug("Rest Request to search JobTitles by sorting and pagination");
+        PaginatedResponseDto<JobTitleDto> paginatedResponse = jobTitleService.findJobTitlesBySortingAndPagination(searchDto);
+        return ResponseEntity
+                .ok()
+                .body(paginatedResponse);
+    }
 }

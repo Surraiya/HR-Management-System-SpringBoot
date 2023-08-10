@@ -3,7 +3,7 @@ package com.knits.enterprise.service.company;
 
 import com.knits.enterprise.dto.common.PaginatedResponseDto;
 import com.knits.enterprise.dto.company.JobTitleDto;
-import com.knits.enterprise.dto.search.GenericSearchDto;
+import com.knits.enterprise.dto.search.JobTitleSearchDto;
 import com.knits.enterprise.exceptions.JobTitleException;
 import com.knits.enterprise.mapper.company.JobTitleMapper;
 import com.knits.enterprise.model.company.JobTitle;
@@ -29,12 +29,12 @@ public class JobTitleService {
 
     public JobTitleDto saveNewJobTitle(JobTitleDto jobTitleDto) {
         JobTitle jobTitle = jobTitleMapper.toEntity(jobTitleDto);
-        jobTitle.setStartDate(LocalDateTime.now());
-        jobTitle.setActive(true);
-        User currentUser = new User();
-        currentUser.setId(1L);
-        jobTitle.setCreatedBy(currentUser);
-        JobTitle savedJobTitle =jobTitleRepository.save(jobTitle);
+        jobTitle = jobTitle.toBuilder()
+                .startDate(LocalDateTime.now())
+                .active(true)
+                .createdBy(User.builder().id(1L).active(true).build())
+                .build();
+        JobTitle savedJobTitle = jobTitleRepository.save(jobTitle);
         return jobTitleMapper.toDto(savedJobTitle);
     }
 
@@ -58,17 +58,18 @@ public class JobTitleService {
         jobTitleRepository.delete(jobTitle);
     }
 
-    public PaginatedResponseDto<JobTitleDto> listAll(GenericSearchDto<JobTitle> searchDto) {
+    public PaginatedResponseDto<JobTitleDto> findJobTitlesBySortingAndPagination(JobTitleSearchDto searchDto) {
 
-        Page<JobTitle> jobTitlesPage = jobTitleRepository.findAll(searchDto.getSpecification(),searchDto.getPageable());
-        List<JobTitleDto> jobTitleDtos = jobTitleMapper.toDtos(jobTitlesPage.getContent());
-
-        return PaginatedResponseDto.<JobTitleDto>builder()
-                .page(searchDto.getPage())
-                .size(jobTitleDtos.size())
-                .sortingFields(searchDto.getSort())
-                .sortDirection(searchDto.getDir().name())
-                .data(jobTitleDtos)
-                .build();
+            Page<JobTitle> jobTitlesPage = jobTitleRepository.findAll(searchDto.getSpecification(), searchDto.getPageable());
+            List<JobTitleDto> jobTitlesDtos = jobTitleMapper.toDtos(jobTitlesPage.getContent());
+            if(jobTitlesDtos.isEmpty())
+                throw new JobTitleException("No result found");
+            return PaginatedResponseDto.<JobTitleDto>builder()
+                    .page(searchDto.getPage())
+                    .size(jobTitlesDtos.size())
+                    .sortingFields(searchDto.getSort())
+                    .sortDirection(searchDto.getDir().name())
+                    .data(jobTitlesDtos)
+                    .build();
     }
 }
