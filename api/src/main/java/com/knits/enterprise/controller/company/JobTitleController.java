@@ -4,11 +4,16 @@ import com.knits.enterprise.dto.common.PaginatedResponseDto;
 import com.knits.enterprise.dto.company.JobTitleDto;
 import com.knits.enterprise.dto.search.JobTitleSearchDto;
 import com.knits.enterprise.service.company.JobTitleService;
+import com.knits.enterprise.validations.OnCreate;
+import com.knits.enterprise.validations.OnUpdate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
@@ -19,8 +24,9 @@ public class JobTitleController {
     @Autowired
     private JobTitleService jobTitleService;
 
+    @Validated(OnCreate.class)
     @PostMapping(value = "/saveJobTitle", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<JobTitleDto> createNewJobTitle(@RequestBody JobTitleDto jobTitleDto) {
+    public ResponseEntity<JobTitleDto> createNewJobTitle(@RequestBody @Valid JobTitleDto jobTitleDto) {
         log.debug("REST request to create jobTitle");
         return ResponseEntity
                 .ok()
@@ -36,8 +42,9 @@ public class JobTitleController {
                 .body(jobTitleFound);
     }
 
+    @Validated(OnUpdate.class)
     @PatchMapping(value = "/updateJobTitle/{id}", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<JobTitleDto> updateJobTitle(@PathVariable(value = "id") final Long id, @RequestBody JobTitleDto jobTitleDto) {
+    public ResponseEntity<JobTitleDto> updateJobTitle(@PathVariable(value = "id") final Long id, @RequestBody @Valid JobTitleDto jobTitleDto) {
         log.debug("REST request to update jobTitle of ID: {}", id);
         JobTitleDto updatedJobTitle = jobTitleService.partialUpdate(id, jobTitleDto);
         return ResponseEntity

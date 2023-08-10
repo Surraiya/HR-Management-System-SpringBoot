@@ -14,4 +14,6 @@ public interface JobTitleRepository extends ActiveEntityRepository<JobTitle> {
     @Query("select j from JobTitle  j  where j.id IN (:ids) AND j.active = true")
     Set<JobTitle> findAllById(@Param("ids") Set<Long> ids);
 
+    @Query("select j from JobTitle j where j.name = (:name)")
+    JobTitle findByName(@Param("name") String name);
 }

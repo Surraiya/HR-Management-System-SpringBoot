@@ -14,10 +14,9 @@ import java.io.Serializable;
 @Table(name = "job_title")
 public class JobTitle extends AbstractOrganizationStructure implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 1099)
     private String description;
-
 }
