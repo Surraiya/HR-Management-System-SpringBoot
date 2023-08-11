@@ -44,3 +44,7 @@ logging:
     com:
       knits:
         enterprise: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui-doc.html
