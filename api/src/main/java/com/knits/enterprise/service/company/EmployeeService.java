@@ -3,6 +3,7 @@ package com.knits.enterprise.service.company;
 
 import com.knits.enterprise.dto.common.PaginatedResponseDto;
 import com.knits.enterprise.dto.company.EmployeeDto;
+import com.knits.enterprise.dto.search.EmployeeSearchDto;
 import com.knits.enterprise.dto.search.GenericSearchDto;
 import com.knits.enterprise.exceptions.UserException;
 import com.knits.enterprise.mapper.company.EmployeeMapper;
@@ -30,8 +31,8 @@ public class EmployeeService {
     @Transactional
     public EmployeeDto saveNewEmployee(EmployeeDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
-        Employee savedEmployee =employeeRepository.save(employee);
-        return employeeMapper.toDto(savedEmployee );
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.toDto(savedEmployee);
     }
 
     @Transactional
@@ -57,10 +58,8 @@ public class EmployeeService {
 
     }
 
-
-    public PaginatedResponseDto<EmployeeDto> listAll(GenericSearchDto<Employee> searchDto) {
-
-        Page<Employee> employeesPage = employeeRepository.findAll(searchDto.getSpecification(),searchDto.getPageable());
+    public PaginatedResponseDto<EmployeeDto> search(EmployeeSearchDto searchDto) {
+        Page<Employee> employeesPage = employeeRepository.findAll(searchDto.getSpecification(), searchDto.getPageable());
         List<EmployeeDto> employeeDtos = employeeMapper.toDtos(employeesPage.getContent());
 
         return PaginatedResponseDto.<EmployeeDto>builder()
