@@ -1,6 +1,6 @@
 package com.knits.enterprise.exceptions.exceptionHandler;
 
-import com.knits.enterprise.exceptions.JobTitleException;
+import com.knits.enterprise.exceptions.UserException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +35,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(JobTitleException.class)
+    @ExceptionHandler(UserException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Map<String, List<String>>> handleNotFoundException(JobTitleException e) {
+    public ResponseEntity<Map<String, List<String>>> handleNotFoundException(UserException e) {
         List<String> errors = getErrorMessages(e);
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }

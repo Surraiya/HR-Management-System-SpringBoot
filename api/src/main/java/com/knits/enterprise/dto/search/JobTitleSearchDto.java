@@ -40,7 +40,7 @@ public class JobTitleSearchDto extends GenericSearchDto<JobTitle>{
             log.debug("Filtering on jobTitle name: {}", name);
             String namePattern = "%" + name.toLowerCase() + "%";
             Expression<String> nameLower = criteriaBuilder.lower(root.get("name"));
-            Predicate nameAsPredicate = criteriaBuilder.like(nameLower, namePattern);
+            Predicate nameAsPredicate = criteriaBuilder.equal(nameLower, namePattern);
             filters.add(nameAsPredicate);
         }
 
@@ -49,7 +49,7 @@ public class JobTitleSearchDto extends GenericSearchDto<JobTitle>{
             String namePattern = "%" + createdBy.toLowerCase() + "%";
             Join<JobTitle, User> userJoin = root.join("createdBy");
             Expression<String> createdByLower = criteriaBuilder.lower(userJoin.get("createdBy"));
-            Predicate createdByPredicate = criteriaBuilder.like(createdByLower, namePattern);
+            Predicate createdByPredicate = criteriaBuilder.equal(createdByLower, namePattern);
             filters.add(createdByPredicate);
         }
 

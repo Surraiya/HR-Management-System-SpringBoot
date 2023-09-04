@@ -28,11 +28,11 @@ public class AbstractOrganizationStructureDto extends AbstractActiveDto {
     @Size(groups = {OnCreate.class, OnUpdate.class}, min = 3, max = 150, message = "Invalid Name: Must be of 3 - 150 characters")
     private String description;
 
-    @Pattern(regexp = "dd/MM/yyyy", message = "Invalid pattern: date should be in ss/MM/yyyy pattern")
+    @Pattern(regexp = "dd/MM/yyyy", message = "Invalid pattern: date should be in dd/MM/yyyy pattern")
     @NotNull(groups = {OnCreate.class}, message = "startDate is mandatory for create")
     private String startDate;
 
-    @Pattern(regexp = "dd/MM/yyyy", message = "Invalid pattern: date should be in ss/MM/yyyy pattern")
+    @Pattern(regexp = "dd/MM/yyyy", message = "Invalid pattern: date should be in dd/MM/yyyy pattern")
     private String endDate;
 
     @NotNull(groups = {OnCreate.class}, message = "createdBy is mandatory for create")

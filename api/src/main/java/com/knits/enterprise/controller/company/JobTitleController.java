@@ -39,7 +39,7 @@ public class JobTitleController {
                     content = @Content) })
     @Validated(OnCreate.class)
     @PostMapping(value = "/saveJobTitle", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<JobTitleDto> createNewJobTitle(@Parameter(description = "JobTitle to create") @RequestBody @Valid JobTitleDto jobTitleDto) {
+    public ResponseEntity<JobTitleDto> create(@Parameter(description = "JobTitle to create") @RequestBody @Valid JobTitleDto jobTitleDto) {
         log.debug("REST request to create jobTitle");
         return ResponseEntity
                 .ok()
@@ -56,7 +56,7 @@ public class JobTitleController {
             @ApiResponse(responseCode = "404", description = "JobTitle not found",
                     content = @Content) })
     @GetMapping(value = "/viewJobTitle/{id}", produces = {"application/json"})
-    public ResponseEntity<JobTitleDto> getjobTitleById(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id) {
+    public ResponseEntity<JobTitleDto> findById(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id) {
         log.debug("REST request to view jobTitle of ID: {}", id);
         JobTitleDto jobTitleFound = jobTitleService.findJobTitleById(id);
         return ResponseEntity
@@ -75,7 +75,7 @@ public class JobTitleController {
                     content = @Content)})
     @Validated(OnUpdate.class)
     @PatchMapping(value = "/updateJobTitle/{id}", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<JobTitleDto> updateJobTitle(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id,
+    public ResponseEntity<JobTitleDto> update(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id,
                                                       @Parameter(description = "JobTitle to update") @RequestBody @Valid JobTitleDto jobTitleDto) {
         log.debug("REST request to update jobTitle of ID: {}", id);
         JobTitleDto updatedJobTitle = jobTitleService.partialUpdate(id, jobTitleDto);
@@ -94,9 +94,9 @@ public class JobTitleController {
             @ApiResponse(responseCode = "404", description = "JobTitle not found",
                     content = @Content)})
     @DeleteMapping("/deleteJobTitle/{id}")
-    public ResponseEntity<Void> deleteJobTitle(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id) {
+    public ResponseEntity<Void> delete(@Parameter(description = "id of jobTitle to be searched") @PathVariable(value = "id") final Long id) {
         log.debug("REST request to delete JobTitle of ID: {}", id);
-        jobTitleService.deleteJobTitle(id);
+        jobTitleService.delete(id);
         return ResponseEntity
                 .noContent()
                 .build();
@@ -112,9 +112,9 @@ public class JobTitleController {
             @ApiResponse(responseCode = "404", description = "Paginated JobTitles not found",
                     content = @Content)})
     @GetMapping(value = "/searchJobTitles", produces = {"application/json"}, consumes = {"application/json"})
-    public ResponseEntity<PaginatedResponseDto<JobTitleDto>> searchJobTitles(@Parameter(description = "JobTitles search option") @RequestBody JobTitleSearchDto searchDto){
+    public ResponseEntity<PaginatedResponseDto<JobTitleDto>> search(@Parameter(description = "JobTitles search option") @RequestBody JobTitleSearchDto searchDto){
         log.debug("Rest Request to search JobTitles by sorting and pagination");
-        PaginatedResponseDto<JobTitleDto> paginatedResponse = jobTitleService.findJobTitlesBySortingAndPagination(searchDto);
+        PaginatedResponseDto<JobTitleDto> paginatedResponse = jobTitleService.findBySortingAndPagination(searchDto);
         return ResponseEntity
                 .ok()
                 .body(paginatedResponse);
