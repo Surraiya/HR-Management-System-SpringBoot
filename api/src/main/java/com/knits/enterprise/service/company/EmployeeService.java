@@ -8,6 +8,7 @@ import com.knits.enterprise.dto.search.GenericSearchDto;
 import com.knits.enterprise.exceptions.UserException;
 import com.knits.enterprise.mapper.company.EmployeeMapper;
 import com.knits.enterprise.model.company.Employee;
+import com.knits.enterprise.model.security.User;
 import com.knits.enterprise.repository.company.EmployeeRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,8 @@ public class EmployeeService {
     public PaginatedResponseDto<EmployeeDto> search(EmployeeSearchDto searchDto) {
         Page<Employee> employeesPage = employeeRepository.findAll(searchDto.getSpecification(), searchDto.getPageable());
         List<EmployeeDto> employeeDtos = employeeMapper.toDtos(employeesPage.getContent());
-
+        if(employeeDtos.isEmpty())
+            throw new UserException("No result found");
         return PaginatedResponseDto.<EmployeeDto>builder()
                 .page(searchDto.getPage())
                 .size(employeeDtos.size())

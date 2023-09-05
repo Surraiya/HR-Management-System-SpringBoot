@@ -102,18 +102,9 @@ class JobTitleServiceTest {
     @Test
     @DisplayName("find jobTitle by Id fail : is not found")
     void findJobTitleByIdFail() {
-        JobTitle jobTitle = JobTitle.builder()
-                .id(1L)
-                .name("A test name")
-                .description("A test description")
-                .startDate(LocalDate.parse("04/09/2023", Constants.DATE_FORMATTER))
-                .active(true)
-                .createdBy(user)
-                .build();
-
         when(jobTitleRepository.findById(any())).thenThrow(new UserException(exceptionMessage));
         UserException exception = assertThrows(UserException.class,
-                () -> jobTitleService.findJobTitleById(jobTitle.getId()));
+                () -> jobTitleService.findJobTitleById(id));
         assertEquals(exceptionMessage, exception.getMessage());
     }
 

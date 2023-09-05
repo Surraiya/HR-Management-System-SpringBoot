@@ -8,11 +8,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.knits.enterprise.config.Constants.DATE_FORMATTER;
@@ -36,42 +34,44 @@ public class JobTitleSearchDto extends GenericSearchDto<JobTitle>{
                               List<Predicate> filters){
         log.debug("Entering addFilters");
 
-        if (StringUtils.isNotEmpty(name)) {
+        if (name != null) {
             log.debug("Filtering on jobTitle name: {}", name);
-            String namePattern = "%" + name.toLowerCase() + "%";
-            Expression<String> nameLower = criteriaBuilder.lower(root.get("name"));
-            Predicate nameAsPredicate = criteriaBuilder.equal(nameLower, namePattern);
-            filters.add(nameAsPredicate);
+            filters.add(
+                    criteriaBuilder.equal(criteriaBuilder.lower(root.get("name")), name.toLowerCase())
+            );
         }
 
-        if (StringUtils.isNotEmpty(createdBy)) {
+        if (createdBy != null) {
             log.debug("Filtering on creator's userName: {}", createdBy);
-            String namePattern = "%" + createdBy.toLowerCase() + "%";
             Join<JobTitle, User> userJoin = root.join("createdBy");
-            Expression<String> createdByLower = criteriaBuilder.lower(userJoin.get("createdBy"));
-            Predicate createdByPredicate = criteriaBuilder.equal(createdByLower, namePattern);
-            filters.add(createdByPredicate);
+            filters.add(
+                    criteriaBuilder.equal(criteriaBuilder.lower(userJoin.get("createdBy")), createdBy.toLowerCase())
+            );
         }
 
-        if (StringUtils.isNotEmpty(creationDateFrom)) {
+        if (creationDateFrom != null) {
             log.debug("Filtering on jobTitle's creation Date from: {}", creationDateFrom);
-            LocalDateTime formattedDateTime = LocalDate.parse(creationDateFrom, DATE_FORMATTER).atStartOfDay();
-            Predicate creationDateFromPredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), formattedDateTime);
-            filters.add(creationDateFromPredicate);
+            filters.add(
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), LocalDate.parse(creationDateFrom, DATE_FORMATTER))
+            );
         }
 
-        if (StringUtils.isNotEmpty(creationDateTo)) {
+        if (creationDateTo != null) {
             log.debug("Filtering on jobTitle's creation Date to: {}", creationDateTo);
-            LocalDateTime formattedDateTime = LocalDate.parse(creationDateTo, DATE_FORMATTER).atStartOfDay();
-            Predicate creationDateToPredicate = criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), formattedDateTime);
-            filters.add(creationDateToPredicate);
+            filters.add(
+                    criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), LocalDate.parse(creationDateTo, DATE_FORMATTER))
+            );
         }
-        if (StringUtils.isNotEmpty(creationDateFrom) && StringUtils.isNotEmpty(creationDateTo)) {
+
+        if (creationDateFrom != null && creationDateTo != null) {
             log.debug("Filtering on jobTitle's creation Date to: {} and creation Date from: {}", creationDateTo, creationDateFrom);
-            LocalDateTime formattedDateFromTime = LocalDate.parse(creationDateFrom, DATE_FORMATTER).atStartOfDay();
-            LocalDateTime formattedDateToTime = LocalDate.parse(creationDateTo, DATE_FORMATTER).atStartOfDay();
-            Predicate creationDateBetweenPredicate = criteriaBuilder.between(root.get("startDate"), formattedDateFromTime, formattedDateToTime);
-            filters.add(creationDateBetweenPredicate);
+            filters.add(
+                    criteriaBuilder.between(
+                            root.get("startDate"),
+                            LocalDate.parse(creationDateFrom, DATE_FORMATTER),
+                            LocalDate.parse(creationDateTo, DATE_FORMATTER)
+                    )
+            );
         }
     }
 }
