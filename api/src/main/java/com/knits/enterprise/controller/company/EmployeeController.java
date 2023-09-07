@@ -7,8 +7,13 @@ import com.knits.enterprise.service.company.EmployeeService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayInputStream;
 
 
 @RestController
@@ -62,5 +67,19 @@ public class EmployeeController {
         return ResponseEntity
                 .ok()
                 .body(paginatedResponse);
+    }
+
+    @GetMapping(value = "/exportEmployeesAsExcel", consumes = {"application/json"}, produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public ResponseEntity<ByteArrayResource> exportAsExcel(@RequestBody EmployeeSearchDto searchDto) {
+        ByteArrayInputStream excelData = employeeService.employeesToExcel(searchDto);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=Employees-.xlsx");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new ByteArrayResource(excelData.readAllBytes()));
     }
 }
