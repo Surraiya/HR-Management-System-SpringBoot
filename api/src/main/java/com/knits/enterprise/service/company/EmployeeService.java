@@ -7,15 +7,25 @@ import com.knits.enterprise.dto.search.EmployeeSearchDto;
 import com.knits.enterprise.exceptions.UserException;
 import com.knits.enterprise.mapper.company.EmployeeMapper;
 import com.knits.enterprise.model.company.Employee;
-import com.knits.enterprise.repository.company.EmployeeRepository;
+import com.knits.enterprise.model.enums.Gender;
+import com.knits.enterprise.repository.company.*;
+import com.knits.enterprise.repository.location.LocationRepository;
+import com.knits.enterprise.utils.Constant;
+import com.knits.enterprise.utils.DateUtils;
 import com.knits.enterprise.utils.ExcelHelper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 
@@ -27,6 +37,14 @@ public class EmployeeService {
 
     private final EmployeeMapper employeeMapper;
     private final EmployeeRepository employeeRepository;
+    private final OrganizationRepository organizationRepository;
+    private final DepartmentRepository departmentRepository;
+    private final DivisionRepository divisionRepository;
+    private final BusinessUnitRepository businessUnitRepository;
+    private final LocationRepository locationRepository;
+    private final JobTitleRepository jobTitleRepository;
+    private final CostCenterRepository costCenterRepository;
+    private final TeamRepository teamRepository;
 
     public EmployeeDto saveNewEmployee(EmployeeDto employeeDto) {
         Employee employee = employeeMapper.toEntity(employeeDto);
@@ -82,6 +100,67 @@ public class EmployeeService {
         String[] headers = { "First Name", "Last Name", "Email", "BirthDate", "Gender", "Start Date", "End Date", "Company Phone Number", "Business Unit name", "Office Country", "Department name", "Job title", "Organization Country" };
         Map<String, List<Object>> employeeData = mapHeaderToCellValue(employees, headers);
         return ExcelHelper.toExcel(employeeData);
+    }
+
+    public void saveEmployeesFromExcel(MultipartFile file) {
+        if (ExcelHelper.isValidExcelFile(file)) {
+            try {
+                List<List<Object>> employeesData = ExcelHelper.getExcelFileValues(file.getInputStream());
+
+                for (List<Object> rowValues : employeesData) {
+                    if(rowValues != null) {
+                        Employee employee = new Employee();
+                        int cellIndex = 0;
+
+                        for (Object cellValue : rowValues) {
+                            setEmployeeAttributeValue(employee, cellIndex, cellValue);
+                            cellIndex++;
+                        }
+
+                        employee = employeeRepository.save(employee);
+                        log.info(String.valueOf(employee));
+                    }
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void setEmployeeAttributeValue(Employee employee, int cellIndex, Object cellValue) {
+        switch (cellIndex) {
+            case 0 -> employee.setFirstName((String) cellValue);
+            case 1 -> employee.setLastName((String) cellValue);
+            case 2 -> employee.setEmail((String) cellValue);
+            case 3 -> employee.setBirthDate(DateUtils.formatDateString(cellValue.toString()));
+            case 4 -> {
+                if (cellValue.toString().equalsIgnoreCase("MALE")) {
+                    employee.setGender(Gender.MALE);
+                } else if (cellValue.toString().equalsIgnoreCase("FEMALE")) {
+                    employee.setGender(Gender.FEMALE);
+                }
+            }
+            case 5 -> employee.setStartDate(DateUtils.formatDateString(cellValue.toString()));
+            case 6 -> {
+                if (cellValue instanceof String) {
+                    employee.setEndDate(DateUtils.formatDateString(cellValue.toString()));
+                } else {
+                    employee.setEndDate(null);
+                }
+            }
+            case 7 -> employee.setCompanyPhone(cellValue.toString());
+            case 8 -> employee.setOrganization(organizationRepository.getById(((Number) cellValue).longValue()));
+            case 9 -> employee.setDepartment(departmentRepository.getById(((Number) cellValue).longValue()));
+            case 10 -> employee.setDivision(divisionRepository.getById(((Number) cellValue).longValue()));
+            case 11 -> employee.setBusinessUnit(businessUnitRepository.getById(((Number) cellValue).longValue()));
+            case 12 -> employee.setOffice(locationRepository.getById(((Number) cellValue).longValue()));
+            case 13 -> employee.setJobTitle(jobTitleRepository.getById(((Number) cellValue).longValue()));
+            case 14 -> employee.setCostCenter(costCenterRepository.getById(((Number) cellValue).longValue()));
+            case 15 -> employee.setTeam(teamRepository.getById(((Number) cellValue).longValue()));
+            case 16 -> employee.setSolidLineManager(employeeRepository.getById(((Number) cellValue).longValue()));
+            case 17 -> employee.setCompanyMobileNumber(cellValue.toString());
+        }
     }
 
     public Map<String, List<Object>> mapHeaderToCellValue(List<EmployeeDto> employees, String[] headers) {
