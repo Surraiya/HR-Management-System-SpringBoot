@@ -12,7 +12,7 @@ This project was done during my internship as a Java Backend Developer at Kuehne
 ## Contributions
 
 ### CRUD Operations
-I was responsible for the development of CRUD (Create, Read, Update, Delete) operations for job titles. This functionality allows efficient management of job titles within the HR system.
+I was responsible for the development of building job titles Rest API and perform a CRUD (Create, Read, Update, Delete) operations using the api. This functionality allows efficient management of job titles within the HR system.
 
 ### Pagination
 To optimize the user experience and enhance data retrieval efficiency, I introduced pagination. This feature ensures that users can navigate through large datasets effortlessly.
